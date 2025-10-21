@@ -1,173 +1,103 @@
-# Invoice Generator for Google Sheets
+# Invoice Generator
 
-This script creates professional invoices in Google Sheets using the same structure and approach as the rest_test.py script, but specifically designed for invoice generation.
+A professional invoice generator that creates formatted invoices in Google Sheets with automated Canadian holiday detection and configurable billing data.
 
 ## Features
 
-- **Professional Invoice Layout**: Matches the formatting from the provided invoice image
-- **Google Sheets Integration**: Uses the invoicepacksize Google credentials
-- **Configurable Invoice Data**: Easy to modify company info, client details, and line items
-- **Automatic Calculations**: Handles subtotals, taxes, and totals
-- **Professional Styling**: Orange company name, proper formatting, and currency display
-- **Canadian Holiday Detection**: Automatically detects and displays Canadian statutory holidays in the notes section
-- **Dynamic Date Descriptions**: Invoice descriptions automatically update based on system date
+- **Professional Layout**: Clean, formatted invoice template with company branding
+- **Google Sheets Integration**: Direct creation and formatting in Google Sheets
+- **JSON Configuration**: Easy-to-modify invoice data via `invoice_config.json`
+- **Canadian Holiday Detection**: Automatically identifies statutory holidays in billing periods
+- **Dynamic Dates**: Auto-generates invoice dates and descriptions
+- **Batch Processing**: Optimized API calls for fast execution
 
-## Setup
+## Quick Start
 
-1. **Install Dependencies**:
+1. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Credentials**: Ensure `invoicepacksize-google-creds.json` is in the same directory as the script
+2. **Configure credentials**: Place `invoicepacksize-google-creds.json` in the project directory
 
-3. **Run the Script**:
+3. **Run the generator**:
    ```bash
-   python invoice.py
+   python invoice_optimized.py
    ```
 
 ## Configuration
 
-The invoice data is configured in the `INVOICE_CONFIG` dictionary at the top of the script:
+Edit `invoice_config.json` to customize:
 
-```python
-INVOICE_CONFIG = {
-    'company_name': 'Motyer Corp',
-    'address': '8140 76th ave NW',
-    'city_province': 'Edmonton AB',
-    'phone': '(250) 258-1143',
-    'client_name': 'Packsize LLC',
-    'currency': 'CAD',
-    'currency_symbol': '$',
-    'tax_rate': 0.0,  # Set to 0.13 for 13% GST
-    'invoice_number': 13,
-    'invoice_date': '4/24/2026',
-    'line_items': [
-        {
-            'description': 'Week of April 13',
-            'quantity': 40,
-            'unit_price': 28.85,
-            'total_price': 1154.00
-        },
-        # Add more line items as needed
-    ]
+```json
+{
+  "company": {
+    "name": "Motyer Corp",
+    "service_description": "Software Engineering Consulting"
+  },
+  "invoice": {
+    "number": 13,
+    "po_number": "PO-2024-001",
+    "tax_rate": 0.0
+  },
+  "client": {
+    "name": "Packsize LLC"
+  },
+  "line_items": [
+    {
+      "description": "Week of April 13",
+      "quantity": 40,
+      "unit_price": 28.85
+    }
+  ]
 }
-```
-
-## Usage Examples
-
-### Basic Usage
-```python
-python invoice.py
-```
-
-### Programmatic Usage
-```python
-from invoice import update_invoice_config, add_line_item, main
-
-# Update invoice details
-update_invoice_config(
-    invoice_number=14,
-    client_name="New Client LLC",
-    invoice_date="5/1/2026"
-)
-
-# Add a new line item
-add_line_item("Week of April 27", 40, 28.85)
-
-# Generate the invoice
-main()
-```
-
-## Invoice Layout
-
-The script creates an invoice with the following structure:
-
-1. **Company Header** (Rows 3-6): Company name, address, city/province, phone
-2. **Invoice Title** (Rows 8-9): "Invoice" title and submission date
-3. **Invoice Details** (Rows 11-12): Client info, payable to, invoice number
-4. **Line Items Table** (Rows 18+): Description, quantity, unit price, total price
-5. **Summary** (Rows 24-26): Notes, subtotal, tax (if applicable), total
-
-## Features
-
-- **Automatic Spreadsheet Creation**: Creates a new Google Sheet for each invoice
-- **Professional Formatting**: Orange company name, bold headers, proper alignment
-- **Currency Formatting**: Proper currency symbols and decimal places
-- **Tax Calculation**: Optional tax calculation (set `tax_rate` to enable)
-- **Column Width Optimization**: Automatically sets appropriate column widths
-- **Public Access**: Makes the spreadsheet publicly viewable (optional)
-
-## Customization
-
-### Adding Line Items
-```python
-add_line_item("Service Description", quantity, unit_price)
-```
-
-### Updating Configuration
-```python
-update_invoice_config(
-    company_name="Your Company",
-    client_name="Client Name",
-    tax_rate=0.13  # 13% tax
-)
-```
-
-### Using Existing Spreadsheet
-To use an existing spreadsheet instead of creating a new one, modify the `connect_to_google_sheets()` function:
-
-```python
-# Replace the create() call with:
-spreadsheet = gc.open_by_key('YOUR_SPREADSHEET_ID')
 ```
 
 ## Output
 
-The script will:
-1. Create a new Google Sheet with the invoice
-2. Print the spreadsheet URL
-3. Display invoice totals and summary
-4. Make the sheet publicly viewable (optional)
+The script generates:
+- A new Google Sheet with professional invoice formatting
+- Automatic Canadian holiday detection in notes section
+- Calculated totals and tax amounts
+- Publicly accessible invoice URL
 
-## Error Handling
+## Scheduling
 
-The script includes comprehensive error handling for:
-- Missing credentials file
-- Invalid credentials format
-- Google Sheets API errors
-- Network connectivity issues
-
-## Canadian Holiday Detection
-
-The invoice generator automatically detects Canadian statutory holidays within the invoice period (11 days ago to 4 days ago) and includes them in the notes section. This helps document paid days off without affecting the hours calculation.
-
-### How It Works
-
-1. **Date Range**: Checks the period from 11 days ago to 4 days ago
-2. **Holiday Detection**: Uses the `holidays` package to identify Canadian statutory holidays
-3. **Notes Section**: Displays holidays in the invoice notes with clear labeling
-4. **Hours Unaffected**: Holiday detection is for documentation only - hours remain the same
-
-### Example Output
-
-When holidays are detected, the notes section will show:
+### Windows Task Scheduler
+```bash
+schtasks /create /tn "Invoice Generator" /tr "C:\Python313\python.exe C:\Users\rlmot\OneDrive\Documents\scripts\invoice\invoice_optimized.py" /sc weekly /d SUN /mo 2 /st 09:00
 ```
-📝 Notes
 
-🇨🇦 Canadian Statutory Holidays (Paid Days Off):
-• December 25: Christmas Day
-• December 26: Boxing Day
-
-Note: Holiday hours are included in regular billing.
+### GitHub Actions (Cloud)
+Create `.github/workflows/invoice.yml`:
+```yaml
+name: Generate Invoice
+on:
+  schedule:
+    - cron: '0 9 */14 * *'  # Every 2 weeks at 9 AM
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Generate Invoice
+        run: python invoice_optimized.py
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 ```
 
 ## Dependencies
 
-- `gspread`: Google Sheets API wrapper
-- `google-auth`: Google authentication
-- `gspread-formatting`: Advanced formatting for Google Sheets
-- `holidays`: Canadian statutory holiday detection
+- `gspread` - Google Sheets API
+- `google-auth` - Authentication
+- `holidays` - Canadian holiday detection
 
-See `requirements.txt` for specific versions.
-# invoiceGenerator
+## License
+
+MIT License
