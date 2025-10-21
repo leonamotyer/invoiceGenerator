@@ -1,0 +1,47 @@
+{
+  "company": {
+    "name": "Motyer Corp",
+    "service_description": "Software Engineering Consulting"
+  },
+  "client": {
+    "name": "Packsize LLC"
+  },
+  "invoice": {
+    "number": 1014,
+    "po_number": "PO-2024-001",
+    "currency_symbol": "$",
+    "tax_rate": 0.0,
+    "date_offset_days": 0
+  },
+  "line_items": [
+    {
+      "description": "Week of {week1_date}",
+      "quantity": 40,
+      "unit_price": 28.85,
+      "week_offset": -11
+    },
+    {
+      "description": "Week of {week2_date}",
+      "quantity": 40,
+      "unit_price": 28.85,
+      "week_offset": -4
+    }
+  ],
+  "notes": {
+    "include_holidays": true,
+    "custom_notes": ""
+  },
+  "formatting": {
+    "company_name_color": {
+      "red": 0.706,
+      "green": 0.373,
+      "blue": 0.024
+    },
+    "font_family": "Roboto",
+    "company_name_size": 20,
+    "invoice_title_size": 20,
+    "total_size": 20,
+    "regular_text_size": 10,
+    "label_text_size": 12
+  }
+}
